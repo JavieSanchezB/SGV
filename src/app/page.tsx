@@ -41,7 +41,7 @@ export default function Page() {
   const handleSearchSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const response = await axios.get('/api/establecimiento', { params: searchParams });
+      const response = await axios.get('/api/puntos', { params: searchParams });
       if (response.data.success) {
         setFormData(response.data.data);
         setIsExisting(true);
@@ -68,7 +68,7 @@ export default function Page() {
         toast.info('No se encontró el establecimiento, puede registrarlo');
       }
       setShowForm(true);
-    } catch{
+    } catch {
       toast.error('Error al realizar la consulta');
     }
   };
@@ -85,10 +85,10 @@ export default function Page() {
     event.preventDefault();
     try {
       if (isExisting) {
-        await axios.put('/api/establecimientos', formData);
+        await axios.put('/api/puntos', formData);
         toast.success('Establecimiento actualizado exitosamente');
       } else {
-        await axios.post('/api/establecimientos', formData);
+        await axios.post('/api/puntos', formData);
         toast.success('Establecimiento registrado exitosamente');
       }
     } catch {
