@@ -41,9 +41,9 @@ export default function Page() {
   const handleSearchSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const response = await axios.get('/api/establecimientos', { params: searchParams });
-      if (response.data) {
-        setFormData(response.data);
+      const response = await axios.get('/api/establecimiento', { params: searchParams });
+      if (response.data.success) {
+        setFormData(response.data.data);
         setIsExisting(true);
         toast.success('Datos cargados exitosamente');
       } else {
@@ -68,7 +68,7 @@ export default function Page() {
         toast.info('No se encontró el establecimiento, puede registrarlo');
       }
       setShowForm(true);
-    } catch {
+    } catch{
       toast.error('Error al realizar la consulta');
     }
   };

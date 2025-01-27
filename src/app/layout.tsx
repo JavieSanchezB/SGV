@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Visitas',
-  description: 'Registrar una visita de un establecimiento',
+  description: 'Consultar o Registrar una visita de un establecimiento',
 }
 
 export default function RootLayout({

@@ -17,6 +17,9 @@ export default async function handler(
   const idOmt = req.query.id_omt ? parseInt(req.query.id_omt as string, 10) : null;
   const nombreEstablecimiento = req.query.nombre_del_establecimiento as string;
 
+  console.log('id_omt:', idOmt);
+  console.log('nombre_del_establecimiento:', nombreEstablecimiento);
+
   if (!idOmt && !nombreEstablecimiento) {
     return res.status(400).json({
       success: false,
@@ -28,18 +31,22 @@ export default async function handler(
     let rows: { id_omt: number; nombre_del_establecimiento: string; direccion: string; telefono: string }[] = [];
     if (idOmt) {
       // Realiza la consulta a la tabla "establecimientos" por id_omt
+      console.log('Consultando por id_omt:', idOmt);
       const result = await query(
         'SELECT * FROM establecimientos WHERE id_omt = $1',
         [idOmt]
       );
       rows = result.rows;
+      console.log('Resultado de la consulta por id_omt:', rows);
     } else if (nombreEstablecimiento) {
       // Realiza la consulta a la tabla "establecimientos" por nombre_del_establecimiento
+      console.log('Consultando por nombre_del_establecimiento:', nombreEstablecimiento);
       const result = await query(
         'SELECT * FROM establecimientos WHERE nombre_del_establecimiento = $1',
         [nombreEstablecimiento]
       );
       rows = result.rows;
+      console.log('Resultado de la consulta por nombre_del_establecimiento:', rows);
     }
 
     // Verifica si se encontraron resultados
