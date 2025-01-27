@@ -1,181 +1,254 @@
 'use client';
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { toast } from 'nextjs-toast-notify';
 import "nextjs-toast-notify/dist/nextjs-toast-notify.css";
 import './styles/globals.css';
 import axios from 'axios';
 
-export default function ConsultarPunto() {
-  const [codPunto, setCodPunto] = useState('');
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
-  const [gpsObtained, setGpsObtained] = useState(false);
-  const [fechaHora, setFechaHora] = useState('');
-  const [data, setData] = useState<VisitaData | null>(null);
+export default function Page() {
+  const [searchParams, setSearchParams] = useState({
+    id_omt: '',
+    nombre_del_establecimiento: '',
+  });
+  const [formData, setFormData] = useState({
+    id_omt: '',
+    nombre_del_establecimiento: '',
+    nombre_del_propietario: '',
+    cc_del_propietario: '',
+    nit_del_propietario: '',
+    tel_del_propietario: '',
+    direccion: '',
+    barrio: '',
+    nombre_del_administrador: '',
+    tel_del_administrador: '',
+    nombre_del_encargado: '',
+    tel_del_encargado: '',
+    fechas_de_pago: '',
+    latitud: '',
+    longitud: '',
+  });
+  const [isExisting, setIsExisting] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleCodPuntoChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setCodPunto(e.target.value);
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setSearchParams((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  interface VisitaData {
-    cod_punto: string;
-    punto: string;
-    circuito: string;
-    barrio: string;
-    celular?: string;
-    dueno: string;
-    nombre_asesor?: string;
-    direccion?: string;
-    fecha: Date;
-  }
-
-  async function fetchPunto() {
-    if (!codPunto) return;
+  const handleSearchSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     try {
-      const res = await fetch(`/api/puntos?cod_punto=${codPunto}`);
-      const responseData = await res.json();
-      if (responseData.data) {
-        setData(responseData.data);
-        toast.success("IDPDV Encontrado", {
-          duration: 1000,
-          position: "bottom-center",
-        });
+      const response = await axios.get('/api/establecimientos', { params: searchParams });
+      if (response.data) {
+        setFormData(response.data);
+        setIsExisting(true);
+        toast.success('Datos cargados exitosamente');
       } else {
-        console.error('No se encontraron datos');
-        toast.error("No se encontró el IDPDV", {
-          duration: 4000,
-          position: "bottom-center",
+        setFormData({
+          id_omt: '',
+          nombre_del_establecimiento: '',
+          nombre_del_propietario: '',
+          cc_del_propietario: '',
+          nit_del_propietario: '',
+          tel_del_propietario: '',
+          direccion: '',
+          barrio: '',
+          nombre_del_administrador: '',
+          tel_del_administrador: '',
+          nombre_del_encargado: '',
+          tel_del_encargado: '',
+          fechas_de_pago: '',
+          latitud: '',
+          longitud: '',
         });
+        setIsExisting(false);
+        toast.info('No se encontró el establecimiento, puede registrarlo');
       }
-    } catch (error) {
-      console.error("Error al consultar el punto:", error);
-    }
-  }
-
-  const getLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-        setGpsObtained(true);
-      });
-    } else {
-      alert("Geolocalización no soportada por este navegador.");
+      setShowForm(true);
+    } catch {
+      toast.error('Error al realizar la consulta');
     }
   };
 
-  const saveData = async () => {
-    if (!data || latitude === null || longitude === null) {
-      toast.error('Faltan datos para guardar la visita.', { duration: 3000 });
-      return;
-    }
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-    const visitaPayload = {
-      punto_id: data.cod_punto,
-      nombre_punto: data.punto,
-      circuito: data.circuito,
-      barrio: data.barrio,
-      celular: data.celular || null,
-      dueno: data.dueno,
-      asesor: data.nombre_asesor || null,
-      direccion: data.direccion || null,
-      fecha: fechaHora,
-      latitud: latitude,
-      longitud: longitude,
-    };
-
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     try {
-      const response = await axios.post('/api/guardar-visita', visitaPayload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      console.log(response);
-      toast.success('Datos guardados correctamente', {
-        duration: 3000,
-        position: 'bottom-center',
-      });
-
-      // Resetea los estados para volver al formulario inicial
-      setCodPunto('');
-      setData(null);
-      setLatitude(null);
-      setLongitude(null);
-      setGpsObtained(false);
-    } catch (error) {
-      console.error("Error al guardar los datos:", error);
-      toast.error('Error al guardar los datos', {
-        duration: 3000,
-        position: 'bottom-center',
-      });
+      if (isExisting) {
+        await axios.put('/api/establecimientos', formData);
+        toast.success('Establecimiento actualizado exitosamente');
+      } else {
+        await axios.post('/api/establecimientos', formData);
+        toast.success('Establecimiento registrado exitosamente');
+      }
+    } catch {
+      toast.error('Error al registrar el establecimiento');
     }
   };
-
-  useEffect(() => {
-    const obtenerFechaHora = () => {
-      const fechaActual = new Date();
-      const fechaHoraFormateada = fechaActual
-        .toISOString()
-        .replace('T', ' ')
-        .slice(0, 19);
-      setFechaHora(fechaHoraFormateada);
-    };
-
-    obtenerFechaHora();
-    const intervalo = setInterval(obtenerFechaHora, 60000);
-    return () => clearInterval(intervalo);
-  }, []);
 
   return (
-    <div className="container">
-  <input
-  type="number"
-  value={codPunto}
-  onChange={(e) => {
-    const value = e.target.value;
-    // Verifica que el valor sea numérico antes de actualizar el estado
-    if (/^\d*$/.test(value)) {
-      setCodPunto(value);
-    }
-  }}
-  placeholder="Ingrese el código de punto"
-  className="input"
-/>
-      <button onClick={fetchPunto} className="button">Consultar</button>
-
-      {data && (
-        <div className="data-container">
-          <p><strong>IDPDV:</strong> {data.cod_punto || 'No disponible'}</p>
-          <p><strong>Nombre del Punto:</strong> {data.punto || 'No disponible'}</p>
-          <p><strong>Circuito:</strong> {data.circuito || 'No disponible'}</p>
-          <p><strong>Barrio:</strong> {data.barrio || 'No disponible'}</p>
-          <p><strong>Celular:</strong> {data.celular || 'No disponible'}</p>
-          <p><strong>Dueño:</strong> {data.dueno || 'No disponible'}</p>
-          <p><strong>Asesor:</strong> {data.nombre_asesor || 'No disponible'}</p>
-          <p><strong>Dirección:</strong> {data.direccion || 'No disponible'}</p>
-          <p><strong>Fecha Visita:</strong> {fechaHora || 'No disponible'}</p>
-
-          <div className="gps-container">
-            {!gpsObtained && (
-              <button onClick={getLocation} className="button">Obtener GPS</button>
-            )}
-            {latitude && longitude && (
-              <div>
-                <p><strong>Latitud:</strong> {latitude}</p>
-                <p><strong>Longitud:</strong> {longitude}</p>
-              </div>
-            )}
-          </div>
-
-          <button 
-            onClick={saveData} 
-            className={`button ${gpsObtained ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300 cursor-not-allowed'}`}
-            disabled={!gpsObtained}
-          >
-            Guardar
-          </button>
+    <html lang="es">
+      <body>
+        <div className="container">
+          <h1 className="title">Buscar o Registrar Establecimiento</h1>
+          {!showForm && (
+            <form onSubmit={handleSearchSubmit} className="search-form">
+              <input
+                type="text"
+                name="id_omt"
+                value={searchParams.id_omt}
+                onChange={handleSearchChange}
+                placeholder="Buscar por ID OMT"
+                className="input"
+              />
+              <input
+                type="text"
+                name="nombre_del_establecimiento"
+                value={searchParams.nombre_del_establecimiento}
+                onChange={handleSearchChange}
+                placeholder="Buscar por Nombre del Establecimiento"
+                className="input"
+              />
+              <button type="submit" className="button">Buscar</button>
+            </form>
+          )}
+          {showForm && (
+            <form onSubmit={handleSubmit} className="form">
+              <input
+                type="text"
+                name="id_omt"
+                value={formData.id_omt}
+                onChange={handleChange}
+                placeholder="ID OMT"
+                className="input"
+              />
+              <input
+                type="text"
+                name="nombre_del_establecimiento"
+                value={formData.nombre_del_establecimiento}
+                onChange={handleChange}
+                placeholder="Nombre del Establecimiento"
+                className="input"
+              />
+              <input
+                type="text"
+                name="nombre_del_propietario"
+                value={formData.nombre_del_propietario}
+                onChange={handleChange}
+                placeholder="Nombre del Propietario"
+                className="input"
+              />
+              <input
+                type="text"
+                name="cc_del_propietario"
+                value={formData.cc_del_propietario}
+                onChange={handleChange}
+                placeholder="CC del Propietario"
+                className="input"
+              />
+              <input
+                type="text"
+                name="nit_del_propietario"
+                value={formData.nit_del_propietario}
+                onChange={handleChange}
+                placeholder="NIT del Propietario"
+                className="input"
+              />
+              <input
+                type="text"
+                name="tel_del_propietario"
+                value={formData.tel_del_propietario}
+                onChange={handleChange}
+                placeholder="Tel del Propietario"
+                className="input"
+              />
+              <input
+                type="text"
+                name="direccion"
+                value={formData.direccion}
+                onChange={handleChange}
+                placeholder="Dirección"
+                className="input"
+              />
+              <input
+                type="text"
+                name="barrio"
+                value={formData.barrio}
+                onChange={handleChange}
+                placeholder="Barrio"
+                className="input"
+              />
+              <input
+                type="text"
+                name="nombre_del_administrador"
+                value={formData.nombre_del_administrador}
+                onChange={handleChange}
+                placeholder="Nombre del Administrador"
+                className="input"
+              />
+              <input
+                type="text"
+                name="tel_del_administrador"
+                value={formData.tel_del_administrador}
+                onChange={handleChange}
+                placeholder="Tel del Administrador"
+                className="input"
+              />
+              <input
+                type="text"
+                name="nombre_del_encargado"
+                value={formData.nombre_del_encargado}
+                onChange={handleChange}
+                placeholder="Nombre del Encargado"
+                className="input"
+              />
+              <input
+                type="text"
+                name="tel_del_encargado"
+                value={formData.tel_del_encargado}
+                onChange={handleChange}
+                placeholder="Tel del Encargado"
+                className="input"
+              />
+              <input
+                type="text"
+                name="fechas_de_pago"
+                value={formData.fechas_de_pago}
+                onChange={handleChange}
+                placeholder="Fechas de Pago"
+                className="input"
+              />
+              <input
+                type="text"
+                name="latitud"
+                value={formData.latitud}
+                onChange={handleChange}
+                placeholder="Latitud"
+                className="input"
+              />
+              <input
+                type="text"
+                name="longitud"
+                value={formData.longitud}
+                onChange={handleChange}
+                placeholder="Longitud"
+                className="input"
+              />
+              <button type="submit" className="button">{isExisting ? 'Actualizar' : 'Registrar'}</button>
+            </form>
+          )}
         </div>
-      )}
-    </div>
+      </body>
+    </html>
   );
 }

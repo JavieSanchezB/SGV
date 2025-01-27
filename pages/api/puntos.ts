@@ -13,28 +13,40 @@ export default async function handler(
     });
   }
 
-  // Obtiene y valida el parámetro id_omt
-  const idOmt = parseInt(req.query.id_omt as string, 10);
+  // Obtiene y valida los parámetros id_omt y nombre_del_establecimiento
+  const idOmt = req.query.id_omt ? parseInt(req.query.id_omt as string, 10) : null;
+  const nombreEstablecimiento = req.query.nombre_del_establecimiento as string;
 
-  if (isNaN(idOmt)) {
+  if (!idOmt && !nombreEstablecimiento) {
     return res.status(400).json({
       success: false,
-      error: 'El parámetro id_omt debe ser un número válido.',
+      error: 'Debes proporcionar id_omt o nombre_del_establecimiento.',
     });
   }
 
   try {
-    // Realiza la consulta a la tabla "establecimientos"
-    const { rows } = await query(
-      'SELECT * FROM establecimientos WHERE id_omt = $1',
-      [idOmt]
-    );
+    let rows: { id_omt: number; nombre_del_establecimiento: string; direccion: string; telefono: string }[] = [];
+    if (idOmt) {
+      // Realiza la consulta a la tabla "establecimientos" por id_omt
+      const result = await query(
+        'SELECT * FROM establecimientos WHERE id_omt = $1',
+        [idOmt]
+      );
+      rows = result.rows;
+    } else if (nombreEstablecimiento) {
+      // Realiza la consulta a la tabla "establecimientos" por nombre_del_establecimiento
+      const result = await query(
+        'SELECT * FROM establecimientos WHERE nombre_del_establecimiento = $1',
+        [nombreEstablecimiento]
+      );
+      rows = result.rows;
+    }
 
     // Verifica si se encontraron resultados
     if (rows.length === 0) {
       return res.status(404).json({
         success: false,
-        error: 'No se encontró información para el ID proporcionado.',
+        error: 'No se encontró información para los parámetros proporcionados.',
       });
     }
 
