@@ -40,13 +40,18 @@ export default async function handler(
       console.log('Resultado de la consulta por id_omt:', rows);
     } else if (nombreEstablecimiento) {
       // Realiza la consulta a la tabla "establecimientos" por nombre_del_establecimiento
-      console.log('Consultando por nombre_del_establecimiento:', nombreEstablecimiento);
       const result = await query(
-        'SELECT * FROM establecimientos WHERE nombre_del_establecimiento = $1',
-        [nombreEstablecimiento]
+        'SELECT * FROM establecimientos WHERE nombre_del_establecimiento ILIKE $1',
+        [`%${nombreEstablecimiento}%`]
       );
       rows = result.rows;
-      console.log('Resultado de la consulta por nombre_del_establecimiento:', rows);
+    }
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'No se encontró información para los parámetros proporcionados.',
+      });
     }
 
     // Verifica si se encontraron resultados

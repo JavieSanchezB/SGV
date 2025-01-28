@@ -25,6 +25,26 @@ export default async function handler(
       longitud,
     } = req.body;
 
+    if (
+      !id_omt ||
+      !nombre_del_establecimiento ||
+      !nombre_del_propietario ||
+      !cc_del_propietario ||
+      !nit_del_propietario ||
+      !tel_del_propietario ||
+      !direccion ||
+      !barrio ||
+      !nombre_del_administrador ||
+      !tel_del_administrador ||
+      !nombre_del_encargado ||
+      !tel_del_encargado ||
+      !fechas_de_pago ||
+      latitud === undefined ||
+      longitud === undefined
+    ) {
+      return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+
     try {
       const result = await query(
         `INSERT INTO establecimientos (
@@ -43,7 +63,7 @@ export default async function handler(
           fechas_de_pago,
           latitud,
           longitud
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
         [
           id_omt,
           nombre_del_establecimiento,
@@ -62,10 +82,11 @@ export default async function handler(
           longitud,
         ]
       );
-      res.status(201).json({ success: true, data: result.rows[0] });
+
+      return res.status(201).json({ success: true, id: result.rows[0].id });
     } catch (error) {
-      console.error('Error al registrar el establecimiento:', error);
-      res.status(500).json({ success: false, error: 'Error interno en el servidor. Por favor, intenta nuevamente.' });
+      console.error('Error al guardar el establecimiento:', error);
+      return res.status(500).json({ error: 'Error interno del servidor' });
     }
   } else if (req.method === 'PUT') {
     // Maneja la solicitud PUT para actualizar un establecimiento existente
@@ -86,6 +107,26 @@ export default async function handler(
       latitud,
       longitud,
     } = req.body;
+
+    if (
+      !id_omt ||
+      !nombre_del_establecimiento ||
+      !nombre_del_propietario ||
+      !cc_del_propietario ||
+      !nit_del_propietario ||
+      !tel_del_propietario ||
+      !direccion ||
+      !barrio ||
+      !nombre_del_administrador ||
+      !tel_del_administrador ||
+      !nombre_del_encargado ||
+      !tel_del_encargado ||
+      !fechas_de_pago ||
+      latitud === undefined ||
+      longitud === undefined
+    ) {
+      return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
 
     try {
       const result = await query(

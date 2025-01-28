@@ -11,37 +11,72 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     allowedHeaders: ['Content-Type'], // Cabeceras permitidas
     origin: '*', // Origen permitido, puede ser "*" para permitir todos
   });
-  res.status(200).json({ message: 'CORS habilitado' });
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   if (req.method === 'POST') {
-    const { punto_id, nombre_punto, circuito, barrio, celular, dueno, asesor, direccion, fecha, latitud, longitud } = req.body;
+    const {
+      id_omt,
+      nombre_del_establecimiento,
+      nombre_del_propietario,
+      cc_del_propietario,
+      nit_del_propietario,
+      tel_del_propietario,
+      direccion,
+      barrio,
+      nombre_del_administrador,
+      tel_del_administrador,
+      nombre_del_encargado,
+      tel_del_encargado,
+      fechas_de_pago,
+      latitud,
+      longitud
+    } = req.body;
 
-    if (!punto_id || !nombre_punto || !circuito || !barrio || !dueno || !fecha || latitud === undefined || longitud === undefined) {
+    if (
+      !id_omt ||
+      !nombre_del_establecimiento ||
+      !nombre_del_propietario ||
+      !cc_del_propietario ||
+      !nit_del_propietario ||
+      !tel_del_propietario ||
+      !direccion ||
+      !barrio ||
+      !nombre_del_administrador ||
+      !tel_del_administrador ||
+      !nombre_del_encargado ||
+      !tel_del_encargado ||
+      !fechas_de_pago ||
+      latitud === undefined ||
+      longitud === undefined
+    ) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
 
     try {
       const queryText = `
         INSERT INTO visitas (
-          punto_id, nombre_punto, circuito, barrio, celular,
-          dueno, asesor, direccion, fecha, latitud, longitud
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
+          id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario,
+          tel_del_propietario, direccion, barrio, nombre_del_administrador, tel_del_administrador,
+          nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id
       `;
-      const values = [punto_id, nombre_punto, circuito, barrio, celular || null, dueno, asesor || null, direccion || null, fecha, latitud, longitud];
+      const values = [
+        id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario,
+        tel_del_propietario, direccion, barrio, nombre_del_administrador, tel_del_administrador,
+        nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud
+      ];
       const result = await query(queryText, values);
 
-      return res.status(201).json({
-        message: 'Visita guardada correctamente',
-        visitaId: result.rows[0].id,
-      });
+      return res.status(201).json({ success: true, id: result.rows[0].id });
     } catch (error) {
       console.error('Error al guardar la visita:', error);
       return res.status(500).json({ error: 'Error interno del servidor' });
     }
+  } else {
+    res.setHeader('Allow', ['POST']);
+    res.status(405).end(`Método ${req.method} no permitido`);
   }
-
-  res.status(405).json({ error: 'Método no permitido' });
 }

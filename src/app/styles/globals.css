@@ -100,3 +100,27 @@ button {
   background-color: #6c757d;
   color: white;
 }
+
+
+/* Estilos para la lista de sugerencias */
+.suggestions-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.suggestions-list li {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.suggestions-list li:hover {
+  background-color: #f1f1f1;
+}
