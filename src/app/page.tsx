@@ -180,7 +180,7 @@ export default function Page() {
             className="form-control"
           />
           {/* Botón de Búsqueda */}
-          <button type="submit" onClick={handleNew} className="btn btn-primary">
+          <button type="submit" className="btn btn-primary">
             Buscar
           </button>
           {/* Botón para Agregar Nuevo Establecimiento */}
