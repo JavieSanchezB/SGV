@@ -133,8 +133,6 @@ export default function Page() {
       toast.error('Error al registrar el establecimiento');
     }
   };
-
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Buscar o Registrar Establecimiento</h1>
