@@ -134,27 +134,7 @@ export default function Page() {
     }
   };
 
-  const handleNew = () => {
-    setFormData({
-      id_omt: '',
-      nombre_del_establecimiento: '',
-      nombre_del_propietario: '',
-      cc_del_propietario: '',
-      nit_del_propietario: '',
-      tel_del_propietario: '',
-      direccion: '',
-      barrio: '',
-      nombre_del_administrador: '',
-      tel_del_administrador: '',
-      nombre_del_encargado: '',
-      tel_del_encargado: '',
-      fechas_de_pago: formatDate(new Date()), // Asegúrate de que sea un array
-      latitud: '',
-      longitud: '',
-    });
-    setIsExisting(false);
-    setShowForm(true);
-  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Buscar o Registrar Establecimiento</h1>
