@@ -1,63 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'bootstrap/dist/css/bootstrap.min.css';
+/* Estilos generales */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  background-color: #f8f9fa;
+  font-family: 'Arial', sans-serif;
 }
 
 .container {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
   max-width: 600px;
-  animation: fadeIn 0.5s ease-in-out;
+  margin: 50px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.title {
+h1 {
+  color: #343a40;
   text-align: center;
-  margin-bottom: 20px;
 }
 
-.input {
+/* Estilos de los inputs */
+.form-control {
   width: 100%;
   padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+  margin-top: 5px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  transition: all 0.3s;
 }
 
-.button {
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Estilos del DatePicker */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+/* Estilos de los botones */
+.btn {
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
-  color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 16px;
+  transition: all 0.3s;
 }
 
-.button:hover {
-  background-color: #0056b3;
+.btn-primary {
+  background: #007bff;
+  color: white;
 }
 
-.search-form, .form {
-  display: flex;
-  flex-direction: column;
+.btn-primary:hover {
+  background: #0056b3;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+/* Espaciado entre elementos */
+.space-y-4 > * + * {
+  margin-top: 16px;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  border: none;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
 }

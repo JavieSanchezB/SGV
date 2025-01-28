@@ -1,26 +1,44 @@
-// Importaciones necesarias
 'use client';
-import { useState, useEffect, ChangeEvent } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import ReactDatePicker from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css';
+import { useState, ChangeEvent } from 'react';
 import { toast } from 'nextjs-toast-notify';
 import './styles/globals.css';
 import 'nextjs-toast-notify/dist/nextjs-toast-notify.css';
 import axios from 'axios';
 
-// Función para convertir una fecha ISO 8601 a formato dd/mm/yyyy
+// Definición de la interfaz para el formato de fecha
 interface FormatDate {
   (dateString: string | Date): string;
 }
 
+// Función para formatear la fecha
 const formatDate: FormatDate = (dateString) => {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  const year = date.getFullYear();  return `${year}-${month}-${day}`;
 };
+
+// Interfaz para los datos del formulario
+interface FormData {
+  id_omt: string;
+  nombre_del_establecimiento: string;
+  nombre_del_propietario: string;
+  cc_del_propietario: string;
+  nit_del_propietario: string;
+  tel_del_propietario: string;
+  direccion: string;
+  barrio: string;
+  nombre_del_administrador: string;
+  tel_del_administrador: string;
+  nombre_del_encargado: string;
+  tel_del_encargado: string;
+  fechas_de_pago: string;
+  latitud: string;
+  longitud: string;
+}
 
 export default function Page() {
   const [searchParams, setSearchParams] = useState({
@@ -28,24 +46,6 @@ export default function Page() {
     nombre_del_establecimiento: '',
   });
 
-  interface FormData {
-    id_omt: string;
-    nombre_del_establecimiento: string;
-    nombre_del_propietario: string;
-    cc_del_propietario: string;
-    nit_del_propietario: string;
-    tel_del_propietario: string;
-    direccion: string;
-    barrio: string;
-    nombre_del_administrador: string;
-    tel_del_administrador: string;
-    nombre_del_encargado: string;
-    tel_del_encargado: string;
-    fechas_de_pago: string;
-    latitud: string;
-    longitud: string;
-  }
-  
   const [formData, setFormData] = useState<FormData>({
     id_omt: '',
     nombre_del_establecimiento: '',
@@ -59,7 +59,7 @@ export default function Page() {
     tel_del_administrador: '',
     nombre_del_encargado: '',
     tel_del_encargado: '',
-    fechas_de_pago: formatDate(new Date()), // Fecha actual como string
+    fechas_de_pago: formatDate(new Date()), // Fecha actual
     latitud: '0',
     longitud: '0',
   });
@@ -67,37 +67,12 @@ export default function Page() {
   const [isExisting, setIsExisting] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
-  const updateGeolocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setFormData((prev) => ({
-            ...prev,
-            latitud: latitude.toFixed(6),
-            longitud: longitude.toFixed(6),
-          }));
-          toast.success('Ubicación obtenida correctamente');
-        },
-        () => toast.error('No se pudo obtener la ubicación. Activa el GPS.')
-      );
-    } else {
-      toast.error('La geolocalización no está soportada en este navegador.');
-    }
-  };
-
-  useEffect(() => {
-    updateGeolocation();
-  }, []); // Solo se ejecuta una vez al montar el componente
-
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setSearchParams((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setSearchParams((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSearchSubmit = async (event: React.FormEvent) => {
@@ -109,16 +84,45 @@ export default function Page() {
         setIsExisting(true);
         toast.success('Datos cargados exitosamente');
       } else {
+        setFormData({
+          id_omt: '',
+          nombre_del_establecimiento: '',
+          nombre_del_propietario: '',
+          cc_del_propietario: '',
+          nit_del_propietario: '',
+          tel_del_propietario: '',
+          direccion: '',
+          barrio: '',
+          nombre_del_administrador: '',
+          tel_del_administrador: '',
+          nombre_del_encargado: '',
+          tel_del_encargado: '',
+          fechas_de_pago: formatDate(new Date()), // Asegúrate de que sea un array
+          latitud: '',
+          longitud: '',
+        });
         setIsExisting(false);
-        toast.info('No se encontró el establecimiento, puede registrarlo.');
+        toast.info('No se encontró el establecimiento, puede registrarlo');
       }
       setShowForm(true);
-    } catch {
-    setFormData({}); // Limpia los datos del formulario
-    setIsExisting(false); // Asegúrate de que refleje el estado correcto
-    setShowForm(true); // Muestra el formulario vacío
-    toast.info('No existe información. Crea un nuevo establecimiento');
+    } catch (error) {
+      toast.error('Error al realizar la consulta');
     }
+  };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value || '', // Usa una cadena vacía si el valor es null
+    }));
+  };
+
+  const handleDateChange = (date: Date | null) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      fechas_de_pago: date ? [date.toISOString().split('T')[0]] : [''],
+    }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -131,14 +135,11 @@ export default function Page() {
         await axios.post('/api/establecimientos', formData);
         toast.success('Establecimiento registrado exitosamente');
       }
-
-      // Resetear estado y volver a búsqueda
-      setShowForm(false);
-      setSearchParams({ id_omt: '', nombre_del_establecimiento: '' });
     } catch {
-      toast.error('Error al registrar o actualizar el establecimiento');
+      toast.error('Error al registrar el establecimiento');
     }
   };
+
   const handleNew = () => {
     setFormData({
       id_omt: '',
@@ -153,7 +154,7 @@ export default function Page() {
       tel_del_administrador: '',
       nombre_del_encargado: '',
       tel_del_encargado: '',
-      fechas_de_pago: formatDate(new Date()), // Asegúrate de que sea un string
+      fechas_de_pago: formatDate(new Date()), // Asegúrate de que sea un array
       latitud: '',
       longitud: '',
     });
@@ -165,52 +166,75 @@ export default function Page() {
       <h1 className="text-2xl font-bold mb-4">Buscar o Registrar Establecimiento</h1>
       {!showForm && (
         <form onSubmit={handleSearchSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="id_omt"
-            value={searchParams.id_omt}
-            onChange={handleSearchChange}
-            placeholder="Buscar por ID OMT"
-            className="input"
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Buscar por ID OMT */}
+           <input
+           type="text"
+           name="id_omt"
+           value={searchParams.id_omt || ''} // Usa una cadena vacía si el valor es null
+           onChange={handleSearchChange}
+           placeholder="Buscar por ID OMT"
+            className="form-control"
           />
+          {/* Buscar por Nombre del Establecimiento */}
           <input
-            type="text"
-            name="nombre_del_establecimiento"
-            value={searchParams.nombre_del_establecimiento}
-            onChange={handleSearchChange}
-            placeholder="Buscar por Nombre del Establecimiento"
-            className="input"
+             type="text"
+             name="nombre_del_establecimiento"
+             value={searchParams.nombre_del_establecimiento || ''} // Usa una cadena vacía si el valor es null
+             onChange={handleSearchChange}
+             placeholder="Buscar por Nombre del Establecimiento"
+            className="form-control"
           />
-           <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Buscar</button>
-              {!isExisting && (
-                <button type="button" onClick={handleNew} className="px-4 py-2 bg-green-500 text-white rounded ml-4">
-                  Nuevo
-                </button>
-              )}
-        </form>
+          {/* Botón de Búsqueda */}
+          <button type="submit" className="btn btn-primary">
+            Buscar
+          </button>
+          {/* Botón para Agregar Nuevo Establecimiento */}
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="btn btn-success"
+          >
+            Nuevo
+          </button>
+        </div>
+      </form>
       )}
 
       {showForm && (
         <form onSubmit={handleSubmit} className="space-y-4">
-          {Object.keys(formData).map((key) => (
-            <input
-              key={key}
-              type="text"
-              name={key}
-              value={formData[key as keyof FormData] || ''}
-              onChange={handleChange}
-              placeholder={key.replace(/_/g, ' ')}
-              className="input"
-            />
-          ))}
-          <button type="submit" className="input">
+          {Object.keys(formData).map((key) =>
+            key === 'fechas_de_pago' ? (
+<ReactDatePicker
+  key="fechas_de_pago"
+  selected={new Date(formData.fechas_de_pago)}
+  onChange={(date: Date | null) => {
+    if (date) {
+      setFormData((prev) => ({
+        ...prev,
+        fechas_de_pago: formatDate(date),
+      }));
+    }
+  }}
+  dateFormat="yyyy-MM-dd"
+  className="w-full p-2 border rounded"
+/>
+            ) : (
+              <input
+                key={key}
+                type="text"
+                name={key}
+                value={formData[key as keyof FormData]}
+                onChange={handleChange}
+                placeholder={key.replace(/_/g, ' ')}
+                className="form-control"
+              />
+            )
+          )}
+          <button type="submit" className="btn btn-primary">
             {isExisting ? 'Actualizar' : 'Registrar'}
           </button>
-          <button
-            type="button"
-            onClick={() => setShowForm(false)}
-            className="input"
-          >
+          <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary">
             Regresar
           </button>
         </form>
