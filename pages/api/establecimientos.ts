@@ -63,7 +63,7 @@ export default async function handler(
           fechas_de_pago,
           latitud,
           longitud
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id`,
         [
           id_omt,
           nombre_del_establecimiento,
@@ -145,7 +145,7 @@ export default async function handler(
           fechas_de_pago = $13,
           latitud = $14,
           longitud = $15
-        WHERE id_omt = $1`,
+        WHERE id_omt = $1 RETURNING id`,
         [
           id_omt,
           nombre_del_establecimiento,
