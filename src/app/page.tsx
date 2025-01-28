@@ -105,7 +105,7 @@ export default function Page() {
         toast.info('No se encontró el establecimiento, puede registrarlo');
       }
       setShowForm(true);
-    } catch (error) {
+    } catch  {
       toast.error('Error al realizar la consulta');
     }
   };
@@ -118,12 +118,6 @@ export default function Page() {
     }));
   };
 
-  const handleDateChange = (date: Date | null) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      fechas_de_pago: date ? [date.toISOString().split('T')[0]] : [''],
-    }));
-  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -186,7 +180,7 @@ export default function Page() {
             className="form-control"
           />
           {/* Botón de Búsqueda */}
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" onClick={handleNew} className="btn btn-primary">
             Buscar
           </button>
           {/* Botón para Agregar Nuevo Establecimiento */}
