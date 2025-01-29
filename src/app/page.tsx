@@ -290,7 +290,7 @@ export default function Page() {
                       nombre_del_establecimiento: newInputValue,
                     }));
                   }}
-                  sx={{ width: 300 }}
+                
                   renderInput={(params) => (
                     <TextField
                       {...params}
