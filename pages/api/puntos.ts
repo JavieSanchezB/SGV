@@ -20,30 +20,23 @@ export default async function handler(
   console.log('id_omt:', idOmt);
   console.log('nombre_del_establecimiento:', nombreEstablecimiento);
 
-  if (!idOmt && !nombreEstablecimiento) {
-    return res.status(400).json({
-      success: false,
-      error: 'Debes proporcionar id_omt o nombre_del_establecimiento.',
-    });
-  }
-
   try {
     let rows: {
-      id_omt: number;
-      nombre_del_establecimiento: string;
-      nombre_del_propietario: string;
-      cc_del_propietario: string;
-      nit_del_propietario: string;
-      tel_del_propietario: string;
-      direccion: string;
-      barrio: string;
-      nombre_del_administrador: string;
-      tel_del_administrador: string;
-      nombre_del_encargado: string;
-      tel_del_encargado: string;
-      fechas_de_pago: string;
-      latitud: number;
-      longitud: number;
+      id_omt?: number;
+      nombre_del_establecimiento?: string;
+      nombre_del_propietario?: string;
+      cc_del_propietario?: string;
+      nit_del_propietario?: number;
+      tel_del_propietario?: string;
+      direccion?: string;
+      barrio?: string;
+      nombre_del_administrador?: string;
+      tel_del_administrador?: string;
+      nombre_del_encargado?: string;
+      tel_del_encargado?: string;
+      fechas_de_pago?: string;
+      latitud?: number;
+      longitud?: number;
     }[] = [];
     if (idOmt) {
       // Realiza la consulta a la tabla "establecimientos" por id_omt
@@ -58,8 +51,15 @@ export default async function handler(
       // Realiza la consulta a la tabla "establecimientos" por nombre_del_establecimiento
       console.log('Consultando por nombre_del_establecimiento:', nombreEstablecimiento);
       const result = await query(
-        'SELECT id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario, tel_del_propietario, direccion, barrio, nombre_del_administrador, tel_del_administrador, nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud FROM establecimientos WHERE nombre_del_establecimiento ILIKE $1',
+        'SELECT * FROM establecimientos WHERE nombre_del_establecimiento ILIKE $1',
         [`%${nombreEstablecimiento}%`]
+      );
+      rows = result.rows;
+    } else {
+      // Si no se proporciona un nombre específico, devuelve todos los nombres de los establecimientos
+      console.log('Consultando todos los nombres de los establecimientos');
+      const result = await query(
+        'SELECT id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario, tel_del_propietario, direccion, barrio, nombre_del_administrador, tel_del_administrador, nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud FROM establecimientos'
       );
       rows = result.rows;
     }
@@ -74,7 +74,7 @@ export default async function handler(
     // Respuesta exitosa con los datos encontrados
     res.status(200).json({
       success: true,
-      data: rows[0],
+      data: rows,
     });
   } catch (error) {
     console.error('Error al consultar la base de datos:', error);

@@ -11,6 +11,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es'; // Importar el locale español
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+
 
 
 interface FormData {
@@ -58,6 +61,24 @@ export default function Page() {
   const [isExisting, setIsExisting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  useEffect(() => {
+    // Realizar la solicitud a la API para obtener todos los nombres de los establecimientos
+    const fetchAllNames = async () => {
+      try {
+        const response = await axios.get('/api/puntos');
+        if (response.data.success) {
+          setSuggestions(response.data.data.map((item: { nombre_del_establecimiento: string }) => item.nombre_del_establecimiento));
+        } else {
+          setSuggestions([]);
+        }
+      } catch  {
+        setSuggestions([]);
+        toast.error('Error al obtener los nombres de los establecimientos');
+      }
+    };
+
+    fetchAllNames();
+  }, []);
 
   useEffect(() => {
     if (searchParams.nombre_del_establecimiento.length > 2) {
@@ -101,7 +122,7 @@ export default function Page() {
       } else {
         setSuggestions([]);
       }
-    } catch {
+    } catch  {
       setSuggestions([]);
       toast.error('Error al obtener sugerencias');
     }
@@ -112,7 +133,7 @@ export default function Page() {
     try {
       const response = await axios.get('/api/puntos', { params: searchParams });
       if (response.data.success) {
-        setFormData(response.data.data);
+        setFormData(response.data.data[0]);
         setIsExisting(true);
         toast.success('Datos cargados exitosamente');
       } else {
@@ -174,14 +195,6 @@ export default function Page() {
     }
   };
 
-  const handleSuggestionClick = async (suggestion: string) => {
-    setSearchParams((prevData) => ({
-      ...prevData,
-      nombre_del_establecimiento: suggestion,
-    }));
-    setSuggestions([]);
-    await handleSearchSubmit(new Event('submit') as unknown as React.FormEvent);
-  };
 
   const updateGPS = () => {
     navigator.geolocation.getCurrentPosition(
@@ -235,23 +248,24 @@ export default function Page() {
               placeholder="Buscar por ID OMT"
               className="form-control"
             />
-            <input
-              type="text"
-              name="nombre_del_establecimiento"
-              value={searchParams.nombre_del_establecimiento || ''}
-              onChange={handleSearchChange}
-              placeholder="Buscar por Nombre del Establecimiento"
-              className="form-control"
-            />
-            {suggestions.length > 0 && (
-              <ul className="suggestions-list">
-                {suggestions.map((suggestion, index) => (
-                  <li key={index} onClick={() => handleSuggestionClick(suggestion)}>
-                    {suggestion}
-                  </li>
-                ))}
-              </ul>
-            )}
+        <Autocomplete
+                  disablePortal
+                  options={suggestions}
+                  getOptionLabel={(option) => option || ''}
+                  sx={{ width: 300 }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Nombre del Establecimiento"
+                      name="nombre_del_establecimiento"
+                      value={searchParams.nombre_del_establecimiento || ''}
+                      onChange={handleSearchChange}
+                      placeholder="Buscar por Nombre del Establecimiento"
+                      className="form-control"
+                    />
+                  )}
+/>
+     
           </div>
           <button type="submit" className="btn btn-primary">Buscar</button>
           <button onClick={handleNew} className="btn btn-success mt-4">Nuevo Establecimiento</button>
@@ -259,6 +273,15 @@ export default function Page() {
       )}
       {showForm && (
        <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+                type="text"
+                name="id_omt"
+                value={formData.id_omt || ''}
+                onChange={handleChange}
+                placeholder="ID OMT"
+                className="form-control"
+                disabled // Hacer que el campo no sea editable
+              />
        {Object.keys(formData).map((key) =>
          key === 'fechas_de_pago' ? (
           <LocalizationProvider key={key} dateAdapter={AdapterDayjs} adapterLocale="es">
@@ -293,6 +316,7 @@ export default function Page() {
                className="form-control"
              />
            ) : (
+          key !== 'id_omt' && (
              <input
                key={key}
                type="text"
@@ -302,7 +326,7 @@ export default function Page() {
                placeholder={key.replace(/_/g, ' ')}
                className="form-control"
              />
-             
+          )
            )
          )
        )}
