@@ -35,8 +35,8 @@ export default async function handler(
       nombre_del_encargado?: string;
       tel_del_encargado?: string;
       fechas_de_pago?: string;
-      latitud?: number;
-      longitud?: number;
+      latitud?: string;
+      longitud?: string;
     }[] = [];
     if (idOmt) {
       // Realiza la consulta a la tabla "establecimientos" por id_omt
