@@ -51,7 +51,7 @@ export default async function handler(
       // Realiza la consulta a la tabla "establecimientos" por nombre_del_establecimiento
       console.log('Consultando por nombre_del_establecimiento:', nombreEstablecimiento);
       const result = await query(
-        'SELECT * FROM establecimientos WHERE nombre_del_establecimiento ILIKE $1',
+        'SELECT id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario, tel_del_propietario, direccion, barrio, nombre_del_administrador, tel_del_administrador, nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud FROM establecimientos WHERE nombre_del_establecimiento ILIKE $1',
         [`${nombreEstablecimiento}`]
       );
       rows = result.rows;
