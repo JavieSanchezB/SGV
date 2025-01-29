@@ -185,11 +185,17 @@ export default function Page() {
       if (isExisting) {
         await axios.put('/api/establecimientos', formData);
         toast.success('Establecimiento actualizado exitosamente');
+        setTimeout(() => {
+          window.location.reload();
+        }, 5000);
       } else {
         await axios.post('/api/establecimientos', formData);
         toast.success('Establecimiento registrado exitosamente');
+        setTimeout(() => {
+          window.location.reload();
+        }, 5000);
       }
-      setShowForm(false); // Regresar a la vista de búsqueda
+      
     } catch {
       toast.error('Error al registrar el establecimiento');
     }
@@ -233,6 +239,32 @@ export default function Page() {
     });
     setIsExisting(false);
     setShowForm(true);
+  };
+  const handleBack = () => {
+    setSearchParams({
+      id_omt: '',
+      nombre_del_establecimiento: ''
+    });
+    setFormData({
+      id_omt: '',
+      nombre_del_establecimiento: '',
+      nombre_del_propietario: '',
+      cc_del_propietario: '',
+      nit_del_propietario: '',
+      tel_del_propietario: '',
+      direccion: '',
+      barrio: '',
+      nombre_del_administrador: '',
+      tel_del_administrador: '',
+      nombre_del_encargado: '',
+      tel_del_encargado: '',
+      fechas_de_pago: '', // Inicializar como cadena vacía
+      latitud: '0',
+      longitud: '0',
+    });
+    setShowForm(false);
+    window.location.reload();
+
   };
   return (
     <div className="container mx-auto p-4">
@@ -342,7 +374,7 @@ export default function Page() {
        <button type="submit" className="btn btn-success">
          {isExisting ? 'Actualizar' : 'Registrar'}
        </button>
-       <button type="button" onClick={() => setShowForm(false)} className="btn btn-danger">
+       <button type="button" onClick={handleBack} className="btn btn-danger">
          Regresar
        </button>
        
