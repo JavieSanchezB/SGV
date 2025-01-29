@@ -1,24 +1,17 @@
 'use client';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import ReactDatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { toast } from 'nextjs-toast-notify';
 import './styles/globals.css';
 import 'nextjs-toast-notify/dist/nextjs-toast-notify.css';
 import axios from 'axios';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es'; // Importar el locale español
 
-interface FormatDate {
-  (dateString: string | Date): string;
-}
-
-const formatDate: FormatDate = (dateString) => {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${year}-${month}-${day}`;
-};
 
 interface FormData {
   id_omt: string;
@@ -159,6 +152,14 @@ export default function Page() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    // Validar que todos los campos estén llenos
+    const missingFields = Object.keys(formData).filter(key => !formData[key as keyof FormData]);
+    if (missingFields.length > 0) {
+      toast.error(`Faltan los siguientes campos: ${missingFields.join(', ')}`);
+      return;
+    }
+
     try {
       if (isExisting) {
         await axios.put('/api/establecimientos', formData);
@@ -220,14 +221,6 @@ export default function Page() {
     setIsExisting(false);
     setShowForm(true);
   };
-
-  const handleDateChange = (date: Date | null) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      fechas_de_pago: date ? formatDate(date) : '', // Aseguramos que la fecha esté formateada
-    }));
-  };
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Buscar o Registrar Establecimiento</h1>
@@ -268,13 +261,26 @@ export default function Page() {
        <form onSubmit={handleSubmit} className="space-y-4">
        {Object.keys(formData).map((key) =>
          key === 'fechas_de_pago' ? (
-          <ReactDatePicker
-          key="fechas_de_pago"
-          selected={formData.fechas_de_pago ? new Date(formData.fechas_de_pago) : undefined} // Verifica que la fecha sea válida
-          onChange={(date: Date | null) => handleDateChange(date)}
-          dateFormat="yyyy-MM-dd"
-          className="w-full p-2 border rounded"
-        />
+          <LocalizationProvider key={key} dateAdapter={AdapterDayjs} adapterLocale="es">
+          <DatePicker
+            value={formData.fechas_de_pago ? dayjs(formData.fechas_de_pago) : null}
+            onChange={(value) => {
+              handleChange({
+                target: {
+                  name: "fechas_de_pago",
+                  value: value ? value.format("YYYY-MM-DD") : "",
+                },
+              } as ChangeEvent<HTMLInputElement>);
+            }}
+            slotProps={{
+              textField: {
+                placeholder: "Fechas de pago",
+                className: "form-control",
+              },
+            }}
+          />
+        </LocalizationProvider>
+        
          ) : (
            ['cc_del_propietario', 'nit_del_propietario', 'tel_del_propietario', 'tel_del_administrador', 'tel_del_encargado'].includes(key) ? (
              <input
@@ -296,6 +302,7 @@ export default function Page() {
                placeholder={key.replace(/_/g, ' ')}
                className="form-control"
              />
+             
            )
          )
        )}
