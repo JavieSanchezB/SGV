@@ -248,10 +248,16 @@ export default function Page() {
               placeholder="Buscar por ID OMT"
               className="form-control"
             />
-        <Autocomplete
+       <Autocomplete
                   disablePortal
                   options={suggestions}
                   getOptionLabel={(option) => option || ''}
+                  onInputChange={(event, newInputValue) => {
+                    setSearchParams((prevData) => ({
+                      ...prevData,
+                      nombre_del_establecimiento: newInputValue,
+                    }));
+                  }}
                   sx={{ width: 300 }}
                   renderInput={(params) => (
                     <TextField

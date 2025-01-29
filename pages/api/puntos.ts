@@ -52,9 +52,10 @@ export default async function handler(
       console.log('Consultando por nombre_del_establecimiento:', nombreEstablecimiento);
       const result = await query(
         'SELECT * FROM establecimientos WHERE nombre_del_establecimiento ILIKE $1',
-        [`%${nombreEstablecimiento}%`]
+        [`${nombreEstablecimiento}`]
       );
       rows = result.rows;
+      console.log('Resultado de la consulta por nombre_del_establecimiento:', rows);
     } else {
       // Si no se proporciona un nombre específico, devuelve todos los nombres de los establecimientos
       console.log('Consultando todos los nombres de los establecimientos');
