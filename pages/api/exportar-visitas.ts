@@ -8,32 +8,49 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Consulta los datos de la tabla `visitas`
+    // Consulta los datos de la tabla `establecimientos`
     const result = await query(
-      'SELECT id, punto_id, nombre_punto, circuito, barrio, celular, dueno, asesor, direccion, fecha, latitud, longitud FROM visitas'
+      `SELECT 
+        id_omt, 
+        nombre_del_establecimiento, 
+        nombre_del_propietario, 
+        cc_del_propietario, 
+        nit_del_propietario, 
+        tel_del_propietario, 
+        direccion, 
+        barrio, 
+        nombre_del_administrador, 
+        tel_del_administrador, 
+        nombre_del_encargado, 
+        tel_del_encargado, 
+        fechas_de_pago, 
+        latitud, 
+        longitud 
+      FROM establecimientos`
     );
 
     // Asegúrate de que tomas solo los datos (rows)
-    const visitas = result.rows;
+    const establecimientos = result.rows;
 
-    if (!visitas || visitas.length === 0) {
-      return res.status(404).json({ message: 'No se encontraron visitas para exportar' });
+    if (!establecimientos || establecimientos.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron establecimientos para exportar' });
     }
 
     // Prepara los datos en un formato para Excel
-    const worksheet = XLSX.utils.json_to_sheet(visitas);
+    const worksheet = XLSX.utils.json_to_sheet(establecimientos);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Visitas');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Establecimientos');
 
     // Genera el archivo Excel
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
 
     // Configura la respuesta para la descarga del archivo
-    res.setHeader('Content-Disposition', 'attachment; filename=visitas.xlsx');
+    res.setHeader('Content-Disposition', 'attachment; filename=establecimientos.xlsx');
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.send(excelBuffer);
   } catch (error) {
-    console.error('Error exportando visitas:', error);
-    res.status(500).json({ message: 'Error al exportar las visitas' });
+    console.error('Error exportando establecimientos:', error);
+    const errorMessage = (error as Error).message;
+    res.status(500).json({ message: `Error al exportar los establecimientos: ${errorMessage}` });
   }
 }
