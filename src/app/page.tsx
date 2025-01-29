@@ -280,7 +280,7 @@ export default function Page() {
                 onChange={handleChange}
                 placeholder="ID OMT"
                 className="form-control"
-                disabled // Hacer que el campo no sea editable
+                disabled={isExisting} // Hacer que el campo no sea editable
               />
        {Object.keys(formData).map((key) =>
          key === 'fechas_de_pago' ? (
