@@ -13,7 +13,8 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/es'; // Importar el locale español
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-
+import logo from '../img/logo_small_SGC.png';
+import Image from 'next/image';
 
 
 interface FormData {
@@ -272,8 +273,15 @@ export default function Page() {
 
   };
   return (
+    
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Buscar o Registrar Establecimiento</h1>
+
+  
+  <h1 >
+  Sistema de Gestión de Clientes
+</h1>
+
+    
       {!showForm && (
         <form onSubmit={handleSearchSubmit} className="space-y-4">
           <div className="flex flex-col md:flex-row gap-4">

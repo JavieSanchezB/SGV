@@ -1,6 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
+
 
 @import 'bootstrap/dist/css/bootstrap.min.css';
 /* Estilos generales */
@@ -21,6 +23,9 @@ body {
 h1 {
   color: #343a40;
   text-align: center;
+  font-size: 2.25rem; /* Ajusta el tamaño del texto */
+  font-weight: 800; /* Aplica un peso de fuente extrabold */
+  font-family: 'Poppins', sans-serif; /* Aplica la fuente Poppins */
 }
 
 /* Estilos de los inputs */
