@@ -17,6 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         cc_del_propietario, 
         nit_del_propietario, 
         tel_del_propietario, 
+        email, 
         direccion, 
         barrio, 
         nombre_del_administrador, 

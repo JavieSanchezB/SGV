@@ -42,7 +42,7 @@ export default async function handler(
       // Realiza la consulta a la tabla "establecimientos" por id_omt
       console.log('Consultando por id_omt:', idOmt);
       const result = await query(
-        'SELECT id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario, tel_del_propietario, direccion, barrio, nombre_del_administrador, tel_del_administrador, nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud FROM establecimientos WHERE id_omt = $1',
+        'SELECT id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario, tel_del_propietario,email, direccion, barrio, nombre_del_administrador, tel_del_administrador, nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud FROM establecimientos WHERE id_omt = $1',
         [idOmt]
       );
       rows = result.rows;
@@ -51,8 +51,8 @@ export default async function handler(
       // Realiza la consulta a la tabla "establecimientos" por nombre_del_establecimiento
       console.log('Consultando por nombre_del_establecimiento:', nombreEstablecimiento);
       const result = await query(
-        'SELECT id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario, tel_del_propietario, direccion, barrio, nombre_del_administrador, tel_del_administrador, nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud FROM establecimientos WHERE nombre_del_establecimiento ILIKE $1',
-        [`${nombreEstablecimiento}`]
+        'SELECT id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario, tel_del_propietario,email, direccion, barrio, nombre_del_administrador, tel_del_administrador, nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud FROM establecimientos WHERE nombre_del_establecimiento ILIKE $1',
+        [`%${nombreEstablecimiento}%`]
       );
       rows = result.rows;
       console.log('Resultado de la consulta por nombre_del_establecimiento:', rows);
@@ -60,7 +60,7 @@ export default async function handler(
       // Si no se proporciona un nombre específico, devuelve todos los nombres de los establecimientos
       console.log('Consultando todos los nombres de los establecimientos');
       const result = await query(
-        'SELECT id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario, tel_del_propietario, direccion, barrio, nombre_del_administrador, tel_del_administrador, nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud FROM establecimientos'
+        'SELECT id_omt, nombre_del_establecimiento, nombre_del_propietario, cc_del_propietario, nit_del_propietario, tel_del_propietario,email, direccion, barrio, nombre_del_administrador, tel_del_administrador, nombre_del_encargado, tel_del_encargado, fechas_de_pago, latitud, longitud FROM establecimientos'
       );
       rows = result.rows;
     }

@@ -14,6 +14,7 @@ export default async function handler(
       cc_del_propietario,
       nit_del_propietario,
       tel_del_propietario,
+      email,
       direccion,
       barrio,
       nombre_del_administrador,
@@ -32,6 +33,7 @@ export default async function handler(
       !cc_del_propietario ||
       !nit_del_propietario ||
       !tel_del_propietario ||
+      !email ||
       !direccion ||
       !barrio ||
       !nombre_del_administrador ||
@@ -54,6 +56,7 @@ export default async function handler(
           cc_del_propietario,
           nit_del_propietario,
           tel_del_propietario,
+          email,
           direccion,
           barrio,
           nombre_del_administrador,
@@ -63,7 +66,7 @@ export default async function handler(
           fechas_de_pago,
           latitud,
           longitud
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ) RETURNING id`,
         [
           id_omt,
           nombre_del_establecimiento,
@@ -71,6 +74,7 @@ export default async function handler(
           cc_del_propietario,
           nit_del_propietario,
           tel_del_propietario,
+          email,
           direccion,
           barrio,
           nombre_del_administrador,
@@ -97,6 +101,7 @@ export default async function handler(
       cc_del_propietario,
       nit_del_propietario,
       tel_del_propietario,
+      email,
       direccion,
       barrio,
       nombre_del_administrador,
@@ -115,6 +120,7 @@ export default async function handler(
       !cc_del_propietario ||
       !nit_del_propietario ||
       !tel_del_propietario ||
+      !email ||
       !direccion ||
       !barrio ||
       !nombre_del_administrador ||
@@ -136,15 +142,16 @@ export default async function handler(
           cc_del_propietario = $4,
           nit_del_propietario = $5,
           tel_del_propietario = $6,
-          direccion = $7,
-          barrio = $8,
-          nombre_del_administrador = $9,
-          tel_del_administrador = $10,
-          nombre_del_encargado = $11,
-          tel_del_encargado = $12,
-          fechas_de_pago = $13,
-          latitud = $14,
-          longitud = $15
+          email = $7,
+          direccion = $8,
+          barrio = $9,
+          nombre_del_administrador = $10,
+          tel_del_administrador = $11,
+          nombre_del_encargado = $12,
+          tel_del_encargado = $13,
+          fechas_de_pago = $14,
+          latitud = $15,
+          longitud = $16
         WHERE id_omt = $1 RETURNING id`,
         [
           id_omt,
@@ -153,6 +160,7 @@ export default async function handler(
           cc_del_propietario,
           nit_del_propietario,
           tel_del_propietario,
+          email,
           direccion,
           barrio,
           nombre_del_administrador,

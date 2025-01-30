@@ -23,6 +23,7 @@ interface FormData {
   cc_del_propietario: string;
   nit_del_propietario: string;
   tel_del_propietario: string;
+  email: string;
   direccion: string;
   barrio: string;
   nombre_del_administrador: string;
@@ -47,6 +48,7 @@ export default function Page() {
     cc_del_propietario: '',
     nit_del_propietario: '',
     tel_del_propietario: '',
+    email: '',
     direccion: '',
     barrio: '',
     nombre_del_administrador: '',
@@ -144,6 +146,7 @@ export default function Page() {
           cc_del_propietario: '',
           nit_del_propietario: '',
           tel_del_propietario: '',
+          email: '',
           direccion: '',
           barrio: '',
           nombre_del_administrador: '',
@@ -227,6 +230,7 @@ export default function Page() {
       cc_del_propietario: '',
       nit_del_propietario: '',
       tel_del_propietario: '',
+      email: '',
       direccion: '',
       barrio: '',
       nombre_del_administrador: '',
@@ -252,6 +256,7 @@ export default function Page() {
       cc_del_propietario: '',
       nit_del_propietario: '',
       tel_del_propietario: '',
+      email: '',
       direccion: '',
       barrio: '',
       nombre_del_administrador: '',
