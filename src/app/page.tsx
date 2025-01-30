@@ -13,8 +13,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/es'; // Importar el locale español
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import logo from '../img/logo_small_SGC.png';
-import Image from 'next/image';
+
 
 
 interface FormData {
